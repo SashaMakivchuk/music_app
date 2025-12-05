@@ -40,10 +40,6 @@ class SpotifySong {
 }
 
 class SpotifyService {
-  // --- CREDENTIALS CONFIGURATION ---
-  
-  // OPTION A: Hardcode them here for testing (Easiest way to fix 404/400 errors on deploy)
-  // OPTION B: Use String.fromEnvironment for production builds
   static const String _clientId = String.fromEnvironment('SPOTIFY_CLIENT_ID', defaultValue: '43ad5e4914584859815e5b9f6ab2e216');
   static const String _clientSecret = String.fromEnvironment('SPOTIFY_CLIENT_SECRET', defaultValue: 'df1b4b72b1ec47cd9726a5120871de4c');
 
@@ -51,19 +47,16 @@ class SpotifyService {
   static DateTime? _tokenExpiry;
 
   static Future<String> _getAccessToken() async {
-    // 1. Check if keys exist
     if (_clientId.isEmpty || _clientSecret.isEmpty) {
       debugPrint("CRITICAL ERROR: Spotify Client ID or Secret is empty.");
       debugPrint("Did you forget to pass --dart-define during build?");
       throw Exception('Missing Spotify Credentials');
     }
 
-    // 2. Return cached token if valid
     if (_accessToken != null && _tokenExpiry != null && DateTime.now().isBefore(_tokenExpiry!)) {
       return _accessToken!;
     }
 
-    // 3. Request new token
     final bytes = utf8.encode('$_clientId:$_clientSecret');
     final base64Str = base64Encode(bytes);
 
