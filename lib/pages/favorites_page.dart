@@ -8,23 +8,18 @@ class FavoritesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final songsAsync = ref.watch(songsProvider);
-    final favIds = ref.watch(favoritesProvider);
-
+    final favoriteSongsAsync = ref.watch(favoriteSongsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Favorites')),
-      body: songsAsync.when(
-        data: (songs) {
-          final favSongs = songs.where((s) => favIds.contains(s.id)).toList();
-          return favSongs.isEmpty
-              ? const Center(child: Text('No favorites yet'))
-              : ListView.builder(
-                  itemCount: favSongs.length,
-                  itemBuilder: (_, i) => SongTile(song: favSongs[i]),
-                );
-        },
+      appBar: AppBar(title: const Text('My Favorites')),
+      body: favoriteSongsAsync.when(
+        data: (songs) => songs.isEmpty
+            ? const Center(child: Text('No favorites yet – tap ♥ on any song!'))
+            : ListView.builder(
+                itemCount: songs.length,
+                itemBuilder: (_, i) => SongTile(song: songs[i]),
+              ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (_, __) => const Center(child: Text('Error loading favorites')),
       ),
     );
   }
